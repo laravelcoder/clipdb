@@ -1,0 +1,35 @@
+<?php
+
+$factory->define(App\Clip::class, function (Faker\Generator $faker) {
+    return [
+        "title" => $faker->name,
+        "ad_enabled" => 1,
+        "total_impressions" => $faker->randomNumber(2),
+        "recommended_frequency" => $faker->name,
+        "ad_airing_date_first" => $faker->date("m/d/Y", $max = 'now'),
+        "ad_airing_date_last" => $faker->date("m/d/Y", $max = 'now'),
+        "brand_id" => factory('App\Brand')->create(),
+        "industry_id" => factory('App\Industry')->create(),
+        "advertiser" => $faker->name,
+        "product" => $faker->name,
+        "description" => $faker->name,
+        "notes" => $faker->name,
+        "agency" => $faker->name,
+        "sourceurl" => $faker->name,
+        "imagespath" => $faker->name,
+        "cai_path" => $faker->name,
+        "caipyurl" => $faker->name,
+        "isci_ad_id" => $faker->name,
+        "copylength" => $faker->name,
+        "media_content" => $faker->name,
+        "media_filename" => $faker->name,
+        "scheduledate" => $faker->name,
+        "expirationdate" => $faker->name,
+        "family" => $faker->name,
+        "subfamily" => $faker->name,
+        "group" => $faker->name,
+        "caipy_clipids" => $faker->name,
+        "reviewstate" => $faker->name,
+        "ignoreimport" => 1,
+    ];
+});
