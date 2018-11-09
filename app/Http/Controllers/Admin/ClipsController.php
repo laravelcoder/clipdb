@@ -102,13 +102,13 @@ class ClipsController extends Controller implements HasMedia
 
             $table->editColumn('images', function ($row) {
                 $build  = '';
-                $build .= '<div class="buttons are-medium">';
+                $build .= '<div class="columns is-mobile is-multiline">';
                 foreach ($row->getMedia('images') as $media) {
-                    $build .= '
-                                  <figure class="image is-16by9">
-                                      <a class="button" href="' . $media->getUrl() . '" target="_blank"><img src="' . $media->getUrl() . '"></a>
-                    
-                                </figure>';
+                    $build .= '<div class="column is-2">
+                             
+                                    <a href="' . $media->getUrl() . '" target="_blank"><img class="img-fluid mx-auto d-block float-left" src="' . $media->getUrl() . '"></a>
+                               
+                            </div>';
                 }
                 $build .= '</div>';
 
