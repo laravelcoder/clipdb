@@ -103,6 +103,13 @@ return [
             'visibility' => 'public',
         ],
 
+        'icons' => [
+            'driver' => 'local',
+            'root'   => public_path('uploads/icons'),
+            'url'        => env('APP_URL') . '/uploads/icons',
+            'visibility' => 'public',
+        ],
+
         'clips' => [
             'driver' => 'local',
             'root'   => public_path('uploads/clips'),

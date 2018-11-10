@@ -78,3 +78,21 @@ Route::group(['middleware' => ['auth', 'approved'], 'prefix' => 'admin', 'as' =>
     })->name('language');
 });
 
+
+// https://github.com/roarkmccolgan/sanika/blob/master/routes/web.php
+// 
+// Route::get('/media/category/{category}/{file}', function($category, $file){
+//     $cat = \App\Category::find($category);
+//     $cat->addMedia(storage_path('source_images/'.$file))->preservingOriginal()->toMediaCollection('title');
+    
+//     return 'success';
+// });
+// Route::get('/media/product/{product}', function(Request $request, $product){
+//     if($request->query('file')){
+//         $prod = \App\Product::find($product);
+//         $prod->addMediaFromUrl($request->query('file'))->toMediaCollection('title');
+        
+//         return 'success';
+//     }
+//     abort(404);
+// });

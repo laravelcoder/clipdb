@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 use Spatie\MediaLibrary\HasMedia\HasMediaTrait;
 use Spatie\MediaLibrary\HasMedia\HasMedia;
 use Spatie\MediaLibrary\Models\Media;
+use Spatie\MediaLibrary\Jobs\PerformConversions;
 
 /**
  * Class Clip
@@ -54,6 +55,15 @@ class Clip extends Model implements HasMedia
         'scheduledate',
     ];
     
+    // public static function boot()
+    // {
+    //     self::created(function (Clip $clip) {
+    //         $this->addMedia(public_path(env('CLIP_PATH'))
+    //             ->withResponsiveImages()
+    //             ->preservingOriginal()
+    //             ->toMediaCollection();
+    //     });
+    // }
 
     /**
      * Set attribute to money format
@@ -161,22 +171,62 @@ class Clip extends Model implements HasMedia
 
     public function registerMediaConversions(Media $media = null)
     {
-        $this->addMediaConversion('icons')
-            ->width(100)
-            ->height(32)
-            ->sharpen(10);
+        
 
-        $this->addMediaCollection('images');
+     $this->addMediaCollection('images');
 
-        $this->addMediaCollection('videos')->singleFile()->useDisk('videos')
+        $this->addMediaCollection('videos')
+            
+            ->singleFile()
             ->registerMediaConversions(function(Media $media){
                 $this->addMediaConversion('videos')
+                    ->useDisk('videos')
                     ->width(560)
                     ->height(315)
                     ->extractVideoFrameAtSecond(2)
                     ->extractVideoFrameAtSecond(20)
                     ->extractVideoFrameAtSecond(30)
+                    ->optimize()
+                    ->nonQueued()
                     ->performOnCollections('videos');
+
+                $this->addMediaConversion('icons')
+                    ->useDisk('icons')
+                    ->width(100)
+                    ->height(32)
+                    ->sharpen(10)
+                    ->optimize()
+                    ->nonQueued();
             });
     }
+    // public function registerMediaCollections()
+    // {
+    //     $this
+    //         ->addMediaCollection('title') 
+    //         ->useDisk('media')
+    //         ->singleFile()
+    //         ->registerMediaConversions(function (Media $media) {
+    //         $this
+    //             ->addMediaConversion('thumb')
+    //             ->fit('contain', 300, 300);
+    //         $this
+    //             ->addMediaConversion('product')
+    //             ->fit('contain', 400, 400);
+    //     });
+    //     $this
+    //         ->addMediaCollection('content');
+    //     $this
+    //         ->addMediaCollection('gallery')
+    //         ->registerMediaConversions(function (Media $media) {
+    //         $this
+    //             ->addMediaConversion('thumb')
+    //             ->fit('contain', 400, 400);
+    //         });
+    //     $this
+    //         ->addMediaCollection('application');
+    //     $this
+    //         ->addMediaCollection('technical');
+    //     $this
+    //         ->addMediaCollection('specifications');
+    // }
 }

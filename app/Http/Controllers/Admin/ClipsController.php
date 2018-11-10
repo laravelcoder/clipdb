@@ -13,6 +13,10 @@ use Yajra\DataTables\DataTables;
 use Spatie\MediaLibrary\HasMedia\HasMedia;
 use Spatie\MediaLibrary\HasMedia\HasMediaTrait;
 
+use Illuminate\Support\Collection;
+use Spatie\MediaLibrary\Conversion\Conversion;
+use Spatie\MediaLibrary\ImageGenerators\BaseGenerator;
+
 class ClipsController extends Controller implements HasMedia
 {
     use FileUploadTrait;
@@ -97,8 +101,13 @@ class ClipsController extends Controller implements HasMedia
             })->setRowAttr(['class' => 'large-title']);
 
             $table->editColumn('video', function ($row) {
-                if($row->video) { return '<div class="embed-responsive embed-responsive-16by9"><video controls poster="'.$row->getFirstMediaUrl('images').'"><source src="'.asset(env('UPLOAD_PATH').'/'.$row->video) .'" type="video/mp4"></video></div><a href="'.asset(env('UPLOAD_PATH').'/'.$row->video) .'" target="_blank">Download file</a>'; };
+                if($row->video) { return '<div class="embed-responsive embed-responsive-16by9"><video controls poster="'.$row->getFirstMediaUrl('images').'"><source src="'.asset(env('CLIP_PATH').'/'.$row->video) .'" type="video/mp4"></video></div><a href="'.asset(env('CLIP_PATH').'/'.$row->video) .'" target="_blank">Download file</a>'; };
             });
+
+// <viideo controls poster="{{ $video->getUrl('thumb') }}">
+//   <source src="{{ $video->getUrl() }}" type="video/mp4">
+//   Your browser does not support the video tag.
+// </video>
 
             $table->editColumn('images', function ($row) {
                 $build  = '';
@@ -239,6 +248,11 @@ class ClipsController extends Controller implements HasMedia
         $request = $this->saveFiles($request);
 
         $clip = Clip::create($request->all());
+
+https://github.com/mouedhen/goulelhom.api/blob/master/app/Http/Controllers/API/Posts/PressAttachmentController.php
+       https://github.com/kickasssubtitles/kickasssubtitles
+        // $clip->addMedia($request->file('video'))->toMediaCollection('videos');
+        // $clip->addMedia($request->file('video'))->toMediaCollection('icons');
 
         foreach ($request->input('industries', []) as $data) {
             $clip->industries()->create($data);
