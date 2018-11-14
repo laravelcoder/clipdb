@@ -45,6 +45,7 @@
                 </thead>
             </table>
         </div>
+
     </div>
 @stop
 

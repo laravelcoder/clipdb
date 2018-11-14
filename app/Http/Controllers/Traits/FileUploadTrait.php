@@ -19,10 +19,15 @@ use Spatie\MediaLibrary\Conversion\Conversion;
 use Spatie\MediaLibrary\ImageGenerators\BaseGenerator;
 use Spatie\MediaLibrary\HasMedia\HasMedia;
 use Spatie\MediaLibrary\HasMedia\HasMediaTrait;
+use Spatie\MediaLibrary\Media;
+//use Spatie\MediaLibrary\HasMedia\Interfaces\HasMedia;
+ 
+use Spatie\MediaLibrary\HasMedia\Interfaces\HasMediaConversions;
 
-
-trait FileUploadTrait
+trait FileUploadTrait 
 {
+ 
+
 
     /**
      * File upload trait used in controllers to upload files
@@ -63,21 +68,27 @@ trait FileUploadTrait
                         mkdir($thumbPath, 0775, true);
                     }
                     Image::make($file)->resize(50, 50)->save($thumbPath . '/' . $filename);
+                    Image::make($file)->resize(100, 40)->save($iconPath . '/' . $filename);
+
                     $width  = $image->width();
                     $height = $image->height();
+
                     if ($width > $request->{$key . '_max_width'} && $height > $request->{$key . '_max_height'}) {
                         $image->resize($request->{$key . '_max_width'}, $request->{$key . '_max_height'});
                     } elseif ($width > $request->{$key . '_max_width'}) {
                         $image->resize($request->{$key . '_max_width'}, null, function ($constraint) {
                             $constraint->aspectRatio();
                         });
+
                     } elseif ($height > $request->{$key . '_max_height'}) {
                         $image->resize(null, $request->{$key . '_max_height'}, function ($constraint) {
                             $constraint->aspectRatio();
                         });
+
                     }
 
-                    $image->save($uploadPath . '/' . $filename);
+                    $image->save($imagePath . '/' . $filename);
+
                     $finalRequest = new Request(array_merge($finalRequest->all(), [$key => $filename]));
                 } else {
              Log::debug("TestingConversions... ");
@@ -85,6 +96,12 @@ trait FileUploadTrait
                     Log::info("UPLOAD VIDEO");
                     $filename     = $request->file($key)->getClientOriginalName();
                     // $filename     = str_slug($filename, '-');
+
+                        // $filename->addMediaConversion('thumb')
+                        //     ->width(368)
+                        //     ->height(232)
+                        //     ->extractVideoFrameAtSecond(20)
+                        //     ->performOnCollections('videos');       
                     
                         $basename = substr($filename, 0, strrpos($filename, "."));
                         $basename = Normalize::titleCase($basename);
@@ -92,14 +109,17 @@ trait FileUploadTrait
                         Log::info("DURATION: " . $ad_duration);
                         // dd($ad_duration);
                         $filename = str_slug($basename) . '.' . $extension;
+
+                        // $conversion = $request->addMedia($request->file($key))->toMediaCollection('images');
                         
                         Log::info("BASENAME: ". $basename);
                         Log::info("FILENAME: ".$filename);
                         //dd($filename);
                     $request->file($key)->move($clipPath, $filename);
                     $finalRequest = new Request(array_merge($finalRequest->all(), [$key => $filename]));
+
                     Log::info("UPLOADED ". $filename);
-                     Log::debug("Conversions->isEmpty()");
+                    Log::debug("Conversions->isEmpty()");
                 }
             }
         }

@@ -10,6 +10,12 @@
 
         <div class="panel-body table-responsive">
             <div class="row">
+        @foreach($clip->getMedia('images') as $media)
+        {{ $media }}
+        @endforeach
+
+
+
                 <div class="col-md-6">
                     <table class="table table-bordered table-striped">
                         <tr>
@@ -23,11 +29,11 @@
                            
                             <video controls poster="{{ $clip->getFirstMediaUrl('images') }}">
                                
-                              <source src="{{ asset(env('UPLOAD_PATH').'/' . $clip->video) }}" type="video/mp4">
+                              <source src="{{ asset(env('CLIP_PATH').'/' . $clip->video) }}" type="video/mp4">
                               Your browser does not support the video tag.
                             </video>
                     
-                                <a href="{{ asset(env('UPLOAD_PATH').'/' . $clip->video) }}" target="_blank">Download file</a>
+                                <a href="{{ asset(env('CLIP_PATH').'/' . $clip->video) }}" target="_blank">Download file</a>
                                 @endif
                             </td>
                         </tr>
@@ -212,7 +218,7 @@
                                     <a href="{{ route('admin.industries.edit',[$industry->id]) }}" class="btn btn-xs btn-info">@lang('global.app_edit')</a>
                                     @endcan
                                     @can('industry_delete')
-{!! Form::open(array(
+                                    {!! Form::open(array(
                                         'style' => 'display: inline-block;',
                                         'method' => 'DELETE',
                                         'onsubmit' => "return confirm('".trans("global.app_are_you_sure")."');",
@@ -278,7 +284,7 @@
                                     <a href="{{ route('admin.brands.edit',[$brand->id]) }}" class="btn btn-xs btn-info">@lang('global.app_edit')</a>
                                     @endcan
                                     @can('brand_delete')
-{!! Form::open(array(
+                                    {!! Form::open(array(
                                         'style' => 'display: inline-block;',
                                         'method' => 'DELETE',
                                         'onsubmit' => "return confirm('".trans("global.app_are_you_sure")."');",

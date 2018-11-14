@@ -8,6 +8,12 @@ use Spatie\MediaLibrary\HasMedia\HasMediaTrait;
 use Spatie\MediaLibrary\HasMedia\HasMedia;
 use Spatie\MediaLibrary\Models\Media;
 use Spatie\MediaLibrary\Jobs\PerformConversions;
+use Spatie\Image\Manipulations;
+use Illuminate\Support\Collection;
+use Spatie\MediaLibrary\Conversion\Conversion;
+use Spatie\MediaLibrary\ImageGenerators\BaseGenerator;
+
+
 
 /**
  * Class Clip
@@ -169,36 +175,11 @@ class Clip extends Model implements HasMedia
         return $this->hasMany(Brand::class, 'clip_id');
     }
 
-    public function registerMediaConversions(Media $media = null)
-    {
-        
+    // public $registerMediaConversionsUsingModelInstance = true;
 
-     $this->addMediaCollection('images');
+ 
 
-        $this->addMediaCollection('videos')
-            
-            ->singleFile()
-            ->registerMediaConversions(function(Media $media){
-                $this->addMediaConversion('videos')
-                    ->useDisk('videos')
-                    ->width(560)
-                    ->height(315)
-                    ->extractVideoFrameAtSecond(2)
-                    ->extractVideoFrameAtSecond(20)
-                    ->extractVideoFrameAtSecond(30)
-                    ->optimize()
-                    ->nonQueued()
-                    ->performOnCollections('videos');
 
-                $this->addMediaConversion('icons')
-                    ->useDisk('icons')
-                    ->width(100)
-                    ->height(32)
-                    ->sharpen(10)
-                    ->optimize()
-                    ->nonQueued();
-            });
-    }
     // public function registerMediaCollections()
     // {
     //     $this
@@ -215,13 +196,7 @@ class Clip extends Model implements HasMedia
     //     });
     //     $this
     //         ->addMediaCollection('content');
-    //     $this
-    //         ->addMediaCollection('gallery')
-    //         ->registerMediaConversions(function (Media $media) {
-    //         $this
-    //             ->addMediaConversion('thumb')
-    //             ->fit('contain', 400, 400);
-    //         });
+
     //     $this
     //         ->addMediaCollection('application');
     //     $this
@@ -229,4 +204,47 @@ class Clip extends Model implements HasMedia
     //     $this
     //         ->addMediaCollection('specifications');
     // }
+    
+
+    public function registerMediaConversions( Media $media = null )
+    {
+        $this->addMediaCollection('images')->useDisk('images')
+            ->registerMediaConversions(function (Media $media) {
+                $this->addMediaConversion('thumb')
+                    ->useDisk('thumbs')
+                    ->width(150)
+                    ->height(120)
+                    ->performOnCollections('videos', 'images')
+                    ->nonQueued();
+            });
+
+        $this->addMediaCollection('videos')->useDisk('videos')->registerMediaConversions(function(Media $media){
+                $this->addMediaConversion('video')
+                    ->width(560)
+                    ->height(315)
+                    ->extractVideoFrameAtSecond(2)
+                    ->extractVideoFrameAtSecond(20)
+                    ->extractVideoFrameAtSecond(30)
+                    // ->optimize()
+                    ->nonQueued()
+                    ->performOnCollections('videos');
+            });
+
+        $this->addMediaCollection('icons')->useDisk('icons')->registerMediaConversions(function (Media $media) {
+            $this->addMediaConversion('icon')
+                ->width(100)
+                ->height(32)
+                ->sharpen(10)
+                // ->optimize()
+                ->nonQueued()
+                ->performOnCollections('icons', 'images');
+            });
+
+        $this->addMediaCollection('gallery')
+            ->registerMediaConversions(function (Media $media) {
+            $this->addMediaConversion('thumb')
+                ->fit('contain', 400, 400);
+            });
+    }
+
 }

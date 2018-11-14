@@ -16,6 +16,8 @@ use Spatie\MediaLibrary\HasMedia\HasMediaTrait;
 use Illuminate\Support\Collection;
 use Spatie\MediaLibrary\Conversion\Conversion;
 use Spatie\MediaLibrary\ImageGenerators\BaseGenerator;
+use Spatie\MediaLibrary\Jobs\PerformConversions;
+use Spatie\MediaLibrary\Jobs\GenerateResponsiveImages;
 
 class ClipsController extends Controller implements HasMedia
 {
@@ -96,7 +98,7 @@ class ClipsController extends Controller implements HasMedia
             });
             $table->editColumn('title', function ($row) {
                 
-                return $row->title ? '<h2>'.$row->title.'</h2>' : '';
+                return $row->title ? '<h4>'.$row->title.'</h4>' : '';
 
             })->setRowAttr(['class' => 'large-title']);
 
@@ -104,10 +106,10 @@ class ClipsController extends Controller implements HasMedia
                 if($row->video) { return '<div class="embed-responsive embed-responsive-16by9"><video controls poster="'.$row->getFirstMediaUrl('images').'"><source src="'.asset(env('CLIP_PATH').'/'.$row->video) .'" type="video/mp4"></video></div><a href="'.asset(env('CLIP_PATH').'/'.$row->video) .'" target="_blank">Download file</a>'; };
             });
 
-// <viideo controls poster="{{ $video->getUrl('thumb') }}">
-//   <source src="{{ $video->getUrl() }}" type="video/mp4">
-//   Your browser does not support the video tag.
-// </video>
+        // <viideo controls poster="{{ $video->getUrl('thumb') }}">
+        //   <source src="{{ $video->getUrl() }}" type="video/mp4">
+        //   Your browser does not support the video tag.
+        // </video>
 
             $table->editColumn('images', function ($row) {
                 $build  = '';
@@ -115,7 +117,9 @@ class ClipsController extends Controller implements HasMedia
                 foreach ($row->getMedia('images') as $media) {
                     $build .= '<div class="column is-2">
                              
-                                    <a href="' . $media->getUrl() . '" target="_blank"><img class="img-fluid mx-auto d-block float-left" src="' . $media->getUrl() . '"></a>
+                                    <a href="' . $media->getUrl() . '" target="_blank">
+                                        <img class="img-fluid mx-auto d-block float-left" src="' . $media->getUrl() . '">
+                                    </a>
                                
                             </div>';
                 }
@@ -208,12 +212,14 @@ class ClipsController extends Controller implements HasMedia
                 return \Form::checkbox("ignoreimport", 1, $row->ignoreimport == 1, ["disabled"]);
             });
 
+ 
+
             $table->rawColumns(['actions','massDelete','title','video','images','ad_enabled','ignoreimport']);
 
             return $table->make(true);
         }
 
-        return view('admin.clips.index');
+        return view('admin.clips.index', compact('media', 'clips'));
     }
 
     /**
@@ -248,11 +254,6 @@ class ClipsController extends Controller implements HasMedia
         $request = $this->saveFiles($request);
 
         $clip = Clip::create($request->all());
-
-https://github.com/mouedhen/goulelhom.api/blob/master/app/Http/Controllers/API/Posts/PressAttachmentController.php
-       https://github.com/kickasssubtitles/kickasssubtitles
-        // $clip->addMedia($request->file('video'))->toMediaCollection('videos');
-        // $clip->addMedia($request->file('video'))->toMediaCollection('icons');
 
         foreach ($request->input('industries', []) as $data) {
             $clip->industries()->create($data);
@@ -372,7 +373,9 @@ https://github.com/mouedhen/goulelhom.api/blob/master/app/Http/Controllers/API/P
         }
         
         $brands = \App\Brand::get()->pluck('name', 'id')->prepend(trans('global.app_please_select'), '');
-        $industries = \App\Industry::get()->pluck('name', 'id')->prepend(trans('global.app_please_select'), '');$industries = \App\Industry::where('clip_id', $id)->get();$brands = \App\Brand::where('clip_id', $id)->get();
+        $industries = \App\Industry::get()->pluck('name', 'id')->prepend(trans('global.app_please_select'), '');
+        $industries = \App\Industry::where('clip_id', $id)->get();
+        $brands = \App\Brand::where('clip_id', $id)->get();
 
         $clip = Clip::findOrFail($id);
 
