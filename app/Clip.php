@@ -174,42 +174,10 @@ class Clip extends Model implements HasMedia
     public function brands() {
         return $this->hasMany(Brand::class, 'clip_id');
     }
-
-    // public $registerMediaConversionsUsingModelInstance = true;
-
  
-
-
-    // public function registerMediaCollections()
-    // {
-    //     $this
-    //         ->addMediaCollection('title') 
-    //         ->useDisk('media')
-    //         ->singleFile()
-    //         ->registerMediaConversions(function (Media $media) {
-    //         $this
-    //             ->addMediaConversion('thumb')
-    //             ->fit('contain', 300, 300);
-    //         $this
-    //             ->addMediaConversion('product')
-    //             ->fit('contain', 400, 400);
-    //     });
-    //     $this
-    //         ->addMediaCollection('content');
-
-    //     $this
-    //         ->addMediaCollection('application');
-    //     $this
-    //         ->addMediaCollection('technical');
-    //     $this
-    //         ->addMediaCollection('specifications');
-    // }
-    
-
-    public function registerMediaConversions( Media $media = null )
+    public function registerMediaConversions()
     {
-        $this->addMediaCollection('images')->useDisk('images')
-            ->registerMediaConversions(function (Media $media) {
+        $this->addMediaCollection('images')->useDisk('images')->registerMediaConversions(function (Media $media) {
                 $this->addMediaConversion('thumb')
                     ->useDisk('thumbs')
                     ->width(150)
@@ -218,7 +186,7 @@ class Clip extends Model implements HasMedia
                     ->nonQueued();
             });
 
-        $this->addMediaCollection('videos')->useDisk('videos')->registerMediaConversions(function(Media $media){
+        $this->addMediaCollection('videos')->useDisk('videos')->registerMediaConversions(function( Media $media = null){
                 $this->addMediaConversion('video')
                     ->width(560)
                     ->height(315)
@@ -230,7 +198,7 @@ class Clip extends Model implements HasMedia
                     ->performOnCollections('videos');
             });
 
-        $this->addMediaCollection('icons')->useDisk('icons')->registerMediaConversions(function (Media $media) {
+        $this->addMediaCollection('icons')->useDisk('icons')->registerMediaConversions(function ( Media $media = null) {
             $this->addMediaConversion('icon')
                 ->width(100)
                 ->height(32)
@@ -240,11 +208,7 @@ class Clip extends Model implements HasMedia
                 ->performOnCollections('icons', 'images');
             });
 
-        $this->addMediaCollection('gallery')
-            ->registerMediaConversions(function (Media $media) {
-            $this->addMediaConversion('thumb')
-                ->fit('contain', 400, 400);
-            });
+
     }
 
 }
